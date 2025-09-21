@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dashboard - Task Manager</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      margin: 0; padding: 20px;
+    }
+    h1 {
+      color: #2c3e50;
+    }
+    #tasks-list {
+      margin-top: 20px;
+    }
+    ul.task-list {
+      list-style-type: none;
+      padding: 0;
+    }
+    ul.task-list li {
+      background: #fff;
+      margin-bottom: 10px;
+      padding: 12px 20px;
+      border-radius: 4px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .task-title {
+      font-weight: bold;
+      font-size: 1.1em;
+    }
+    .task-status {
+      font-style: italic;
+      color: #888;
+    }
+    a.logout-btn {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 10px 15px;
+      background-color: #e74c3c;
+      color: white;
+      text-decoration: none;
+      border-radius: 4px;
+    }
+    a.logout-btn:hover {
+      background-color: #c0392b;
+    }
+  </style>
+</head>
+<body>
+  <h1>Welcome to Dashboard</h1>
+  <div id="tasks-list">
+    Loading tasks...
+  </div>
+  <!-- Logout link added here -->
+  <a href="logout" class="logout-btn">Logout</a>
+  
+  <script>
+    fetch('/taskmanager/api/tasks')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('You must be logged in to view tasks');
+        }
+        return response.json();
+      })
+      .then(tasks => {
+        const container = document.getElementById('tasks-list');
+        if (tasks.length === 0) {
+          container.innerHTML = '<p>No tasks found.</p>';
+          return;
+        }
+        const ul = document.createElement('ul');
+        ul.classList.add('task-list');
+
+        tasks.forEach(task => {
+          const li = document.createElement('li');
+
+          const titleSpan = document.createElement('span');
+          titleSpan.classList.add('task-title');
+          titleSpan.textContent = task.title;
+
+          const statusSpan = document.createElement('span');
+          statusSpan.classList.add('task-status');
+          statusSpan.textContent = task.status;
+
+          li.appendChild(titleSpan);
+          li.appendChild(statusSpan);
+
+          ul.appendChild(li);
+        });
+
+        container.innerHTML = '';
+        container.appendChild(ul);
+      })
+      .catch(error => {
+        document.getElementById('tasks-list').innerHTML = '<p>' + error.message + '</p>';
+      });
+  </script>
+</body>
+</html>
